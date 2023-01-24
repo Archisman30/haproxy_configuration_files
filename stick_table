@@ -1,0 +1,14 @@
+backend st_src_global
+    stick-table type ip size 1m expire 10m store http_req_rate(10m)
+
+backend st_src_login
+    stick-table type ip size 1m expire 10m store http_req_rate(10m)
+
+backend st_src_api
+    stick-table type ip size 1m expire 10m store http_req_rate(10m)
+
+frontend fe_main
+    bind *:80
+    http-request track-sc0 src table st_src_global
+    http-request track-sc1 src table st_src_login if { path_beg /login }
+    http-request track-sc1 src table st_src_api if { path_beg /api } ## and from these acls we can create the rules
